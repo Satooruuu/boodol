@@ -8,25 +8,36 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: #1a1a1a; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
         #app-shell { width: 100%; max-width: 420px; background-color: #2D5A27; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-        .logo-large { font-weight: 800; font-size: 3.5rem; letter-spacing: -2px; margin-bottom: 10px; text-shadow: 2px 2px 0px #1a3617; }
+        
+        /* Logo Styles */
+        .logo-image { max-width: 180px; height: auto; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+        
         .tagline { font-size: 1rem; opacity: 0.9; margin-bottom: 40px; text-align: center; }
         .input-group { width: 100%; margin-bottom: 15px; }
         .input-group input { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; background-color: #F56300; color: white; transition: transform 0.2s; }
         .btn:active { transform: scale(0.97); }
+
+        /* Animations */
+        .fade-up { animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 <div id="app-shell">
-    <div class="logo-large">Boodol.</div>
-    <div class="tagline">Healthier meals. Cheaper together.<br>UST Pre-order Hub.</div>
-    <div class="input-group">
+    <img src="logo.png" alt="Boodol Logo" class="logo-image fade-up">
+    
+    <div class="tagline fade-up" style="animation-delay: 0.1s">Healthier meals. Cheaper together.<br>UST Pre-order Hub.</div>
+    <div class="input-group fade-up" style="animation-delay: 0.2s">
         <input type="text" id="student-name" placeholder="Student Name / Nickname">
     </div>
-    <div class="input-group">
+    <div class="input-group fade-up" style="animation-delay: 0.3s">
         <input type="text" id="student-id" placeholder="UST Student ID">
     </div>
-    <button class="btn" onclick="login()">Enter Boodol</button>
+    <button class="btn fade-up" style="animation-delay: 0.4s" onclick="login()">Enter Boodol</button>
 </div>
 
 <script>
