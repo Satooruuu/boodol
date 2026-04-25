@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boodol - Login</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #1a1a1a; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        #app-shell { width: 100%; max-width: 420px; background-color: #2D5A27; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .logo-large { font-weight: 800; font-size: 3.5rem; letter-spacing: -2px; margin-bottom: 10px; text-shadow: 2px 2px 0px #1a3617; }
+        .tagline { font-size: 1rem; opacity: 0.9; margin-bottom: 40px; text-align: center; }
+        .input-group { width: 100%; margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 16px; border-radius: 12px; border: none; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; background-color: #F56300; color: white; transition: transform 0.2s; }
+        .btn:active { transform: scale(0.97); }
+    </style>
+</head>
+<body>
+<div id="app-shell">
+    <div class="logo-large">Boodol.</div>
+    <div class="tagline">Healthier meals. Cheaper together.<br>UST Pre-order Hub.</div>
+    <div class="input-group">
+        <input type="text" id="student-name" placeholder="Student Name / Nickname">
+    </div>
+    <div class="input-group">
+        <input type="text" id="student-id" placeholder="UST Student ID">
+    </div>
+    <button class="btn" onclick="login()">Enter Boodol</button>
+</div>
+
+<script>
+    if(localStorage.getItem('boodol_user')) {
+        window.location.href = 'menu.html';
+    }
+
+    function login() {
+        const name = document.getElementById('student-name').value || "Tomasino";
+        
+        // Reset or initialize tracking
+        if(localStorage.getItem('boodol_user') !== name) {
+            localStorage.setItem('boodol_health_stats', JSON.stringify({ protein: 0, carbs: 0, fats: 0, meals: 0 }));
+        }
+        
+        localStorage.setItem('boodol_user', name);
+        window.location.href = 'menu.html';
+    }
+</script>
+</body>
+</html>

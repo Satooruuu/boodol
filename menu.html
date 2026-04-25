@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Boodol - Menu</title>
+    <style>
+        /* Base & Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #1a1a1a; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        
+        /* Mobile Shell */
+        #app-shell { width: 100%; max-width: 420px; background-color: #Fdfbf7; height: 100vh; position: relative; overflow-y: auto; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .hidden { display: none !important; }
+        
+        /* Navigation */
+        .header-nav { position: sticky; top: 0; z-index: 10; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(253, 251, 247, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #eee; }
+        .header-title { font-weight: 800; font-size: 1.5rem; color: #2D5A27; }
+        .logout-btn { background: none; border: none; color: #F56300; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+        
+        /* Health Insights Dashboard */
+        .health-dashboard { background: #2D5A27; color: white; padding: 15px 20px; margin: 15px 20px 0; border-radius: 16px; box-shadow: 0 4px 15px rgba(45, 90, 39, 0.2); }
+        .health-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; }
+        .health-insight { font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
+        .macro-row { display: flex; gap: 10px; font-size: 0.8rem; }
+        .macro-pill { background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 8px; }
+
+        /* Food Grid & Cards */
+        .food-grid { display: grid; gap: 20px; padding: 20px; padding-bottom: 100px; }
+        .food-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.06); position: relative; cursor: pointer; transition: transform 0.2s; }
+        .food-card.sold-out { opacity: 0.6; filter: grayscale(1); pointer-events: none; }
+        
+        .food-img { width: 100%; height: 220px; background-size: cover; background-position: center; position: relative; }
+        .badges { position: absolute; top: 15px; left: 15px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: white; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .badge.suggested { background: #F56300; box-shadow: 0 0 10px rgba(245, 99, 0, 0.5); }
+        
+        .food-overlay { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 40px 20px 20px; color: white; }
+        .food-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+        .food-title { font-weight: 700; font-size: 1.25rem; margin-bottom: 4px; line-height: 1.2; }
+        .food-price { font-weight: 800; font-size: 1.4rem; color: #F56300; }
+        
+        /* Boodle Limit Progress */
+        .limit-container { width: 100%; background: rgba(255,255,255,0.2); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+        .limit-bar { height: 100%; background: #4CAF50; border-radius: 3px; }
+        .limit-bar.full { background: #e74c3c; }
+        .food-group-stats { font-size: 0.8rem; color: #ccc; display: flex; justify-content: space-between; font-weight: 600; }
+
+        /* Checkout Modal */
+        #checkout-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; display: flex; align-items: flex-end; max-width: 420px; margin: 0 auto; }
+        .checkout-sheet { background: #Fdfbf7; width: 100%; border-radius: 24px 24px 0 0; padding: 30px 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); }
+        .receipt-line { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem; color: #555; }
+        .receipt-line.discount { color: #2D5A27; font-weight: 700; }
+        .receipt-line.total { border-top: 2px dashed #ccc; padding-top: 15px; font-weight: 800; font-size: 1.4rem; color: #111; }
+        .btn { width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 700; font-size: 1.1rem; cursor: pointer; background-color: #F56300; color: white; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+<div id="app-shell">
+    <div class="header-nav">
+        <div class="header-title">Tara, Kain.</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-weight: 600; color: #555; font-size: 0.9rem;" id="user-greeting"></span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="health-dashboard" id="health-dashboard">
+        </div>
+
+    <div class="food-grid" id="food-container">
+        </div>
+
+    <div id="checkout-modal" class="hidden">
+        <div class="checkout-sheet">
+            <h2 style="margin-bottom: 20px; font-weight: 800;">Join the Boodle</h2>
+            <div id="checkout-details"></div>
+            <p style="font-size: 0.8rem; color: #888; margin: 15px 0;">Pre-payment secures vendor cooking count. Limit strictly 50 per batch.</p>
+            <button class="btn" id="pay-btn" onclick="confirmPayment()">Pay via GCash / Maya</button>
+            <button class="btn" style="background: transparent; color: #555; margin-top: 10px;" onclick="closeCheckout()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Core State & Validation
+    const userName = localStorage.getItem('boodol_user');
+    if(!userName) window.location.href = 'index.html';
+    document.getElementById('user-greeting').innerText = `Hi, ${userName}`;
+
+    let healthStats = JSON.parse(localStorage.getItem('boodol_health_stats')) || { protein: 0, carbs: 0, fats: 0, meals: 0 };
+
+    // Expanded 5-Item Inventory
+    const defaultInventory = [
+        { id: 1, name: "Grilled Bangus Belly", image: "https://images.unsplash.com/photo-1544025162-8111149c4fa8?auto=format&fit=crop&w=600&q=80", basePrice: 140, currentGroupSize: 48, maxDiscount: 40, maxLimit: 50, category: "High Protein", nutrition: { p: 40, c: 5, f: 15 } },
+        { id: 2, name: "Vegan Tofu Sisig", image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80", basePrice: 95, currentGroupSize: 42, maxDiscount: 25, maxLimit: 50, category: "Balanced Diet", nutrition: { p: 20, c: 30, f: 10 } },
+        { id: 3, name: "Air-Fried Chicken Inasal", image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80", basePrice: 120, currentGroupSize: 12, maxDiscount: 35, maxLimit: 50, category: "Low Carb", nutrition: { p: 45, c: 2, f: 12 } },
+        { id: 4, name: "Sweet Potato & Beef Bowl", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80", basePrice: 150, currentGroupSize: 22, maxDiscount: 30, maxLimit: 50, category: "High Energy", nutrition: { p: 30, c: 50, f: 15 } },
+        { id: 5, name: "Pinakbet & Brown Rice", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80", basePrice: 110, currentGroupSize: 8, maxDiscount: 25, maxLimit: 50, category: "High Fiber", nutrition: { p: 12, c: 45, f: 5 } }
+    ];
+
+    // BUG FIX: Catch outdated localStorage schemas without nutrition/category data
+    let savedInventory = JSON.parse(localStorage.getItem('boodol_inventory'));
+    if (savedInventory && savedInventory.length > 0 && !savedInventory[0].category) {
+        console.warn("Outdated inventory detected. Resetting to fresh schema to prevent UI crash.");
+        savedInventory = null; 
+        localStorage.removeItem('boodol_inventory');
+    }
+    
+    let inventory = savedInventory || defaultInventory;
+    let selectedFood = null;
+    let neededCategory = "";
+
+    // 2. Health & Suggestion Engine
+    function analyzeDiet() {
+        const dash = document.getElementById('health-dashboard');
+        if (healthStats.meals === 0) {
+            neededCategory = "High Protein"; // Default
+            dash.innerHTML = `
+                <div class="health-title">Diet Profile</div>
+                <div class="health-insight">Start tracking your macros!</div>
+                <div style="font-size: 0.8rem; opacity: 0.8;">Order your first meal to generate insights.</div>
+            `;
+            return;
+        }
+
+        let suggestionText = "";
+        
+        if (healthStats.protein < healthStats.carbs && healthStats.protein < healthStats.fats) {
+            neededCategory = "High Protein";
+            suggestionText = "You're low on protein this week. Let's build muscle.";
+        } else if (healthStats.carbs > healthStats.protein * 1.5) {
+            neededCategory = "Low Carb";
+            suggestionText = "Carb heavy lately! Let's balance it out with lean meats.";
+        } else if (healthStats.fats > healthStats.protein) {
+            neededCategory = "High Fiber";
+            suggestionText = "Time to lighten up. Grab some fiber-rich veggies today.";
+        } else {
+            neededCategory = "Balanced Diet";
+            suggestionText = "Macros look great! Keep up the balanced intake.";
+        }
+
+        dash.innerHTML = `
+            <div class="health-title">Smart Diet Insights</div>
+            <div class="health-insight">${suggestionText}</div>
+            <div class="macro-row">
+                <div class="macro-pill">P: ${healthStats.protein}g</div>
+                <div class="macro-pill">C: ${healthStats.carbs}g</div>
+                <div class="macro-pill">F: ${healthStats.fats}g</div>
+            </div>
+        `;
+    }
+
+    // 3. Discount Logic
+    function getDiscountInfo(item) {
+        let calcDiscount = Math.floor(item.currentGroupSize * 0.80);
+        let finalDiscount = calcDiscount > item.maxDiscount ? item.maxDiscount : calcDiscount;
+        return { discount: finalDiscount, finalPrice: item.basePrice - finalDiscount };
+    }
+
+    // 4. Render Menu Grid
+    function renderMenu() {
+        analyzeDiet();
+        const container = document.getElementById('food-container');
+        container.innerHTML = '';
+
+        // Sort: Suggested category first -> Available -> Sold out
+        let sortedInventory = [...inventory].sort((a, b) => {
+            if (a.currentGroupSize >= a.maxLimit) return 1;
+            if (b.currentGroupSize >= b.maxLimit) return -1;
+            if (a.category === neededCategory) return -1;
+            if (b.category === neededCategory) return 1;
+            return 0;
+        });
+
+        sortedInventory.forEach(item => {
+            const pricing = getDiscountInfo(item);
+            const isFull = item.currentGroupSize >= item.maxLimit;
+            const isSuggested = item.category === neededCategory && !isFull;
+            const progressPercent = (item.currentGroupSize / item.maxLimit) * 100;
+            
+            const card = document.createElement('div');
+            card.className = `food-card ${isFull ? 'sold-out' : ''}`;
+            
+            card.innerHTML = `
+                <div class="food-img" style="background-image: url('${item.image}')">
+                    <div class="badges">
+                        ${isSuggested ? `<div class="badge suggested">⭐ Suggested</div>` : ''}
+                        <div class="badge">${item.category}</div>
+                    </div>
+                </div>
+                <div class="food-overlay">
+                    <div class="food-header">
+                        <div>
+                            <div class="food-title">${item.name}</div>
+                            <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 8px;">
+                                ${item.nutrition.p}g P • ${item.nutrition.c}g C • ${item.nutrition.f}g F
+                            </div>
+                        </div>
+                        <div class="food-price">₱${pricing.finalPrice}</div>
+                    </div>
+                    <div class="limit-container">
+                        <div class="limit-bar ${isFull ? 'full' : ''}" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <div class="food-group-stats">
+                        <span>${isFull ? 'BATCH FULL' : 'Boodle Capacity'}</span>
+                        <span style="color: ${isFull ? '#e74c3c' : '#4CAF50'}">${item.currentGroupSize} / ${item.maxLimit}</span>
+                    </div>
+                </div>
+            `;
+            
+            if (!isFull) {
+                card.onclick = () => openCheckout(item.id);
+            }
+            container.appendChild(card);
+        });
+    }
+
+    // 5. Checkout Processing
+    function openCheckout(id) {
+        selectedFood = inventory.find(i => i.id === id);
+        const pricing = getDiscountInfo(selectedFood);
+        
+        document.getElementById('checkout-details').innerHTML = `
+            <div class="receipt-line"><span>Base Price</span> <span>₱${selectedFood.basePrice}</span></div>
+            <div class="receipt-line discount"><span>Boodle Discount (${selectedFood.currentGroupSize} peers)</span> <span>- ₱${pricing.discount}</span></div>
+            <div class="receipt-line total"><span>Total to Pay</span> <span>₱${pricing.finalPrice}</span></div>
+        `;
+        document.getElementById('checkout-modal').classList.remove('hidden');
+    }
+
+    function closeCheckout() { 
+        document.getElementById('checkout-modal').classList.add('hidden'); 
+    }
+
+    function confirmPayment() {
+        if (selectedFood.currentGroupSize >= selectedFood.maxLimit) return; 
+
+        // Update counts
+        selectedFood.currentGroupSize += 1;
+        localStorage.setItem('boodol_inventory', JSON.stringify(inventory));
+        
+        // Update macros
+        healthStats.protein += selectedFood.nutrition.p;
+        healthStats.carbs += selectedFood.nutrition.c;
+        healthStats.fats += selectedFood.nutrition.f;
+        healthStats.meals += 1;
+        localStorage.setItem('boodol_health_stats', JSON.stringify(healthStats));
+
+        // Save order and transition
+        localStorage.setItem('boodol_current_order', JSON.stringify(selectedFood));
+        window.location.href = 'ticket.html';
+    }
+
+    function logout() {
+        localStorage.removeItem('boodol_user');
+        window.location.href = 'index.html';
+    }
+
+    // Initialize UI
+    renderMenu();
+</script>
+</body>
+</html>
